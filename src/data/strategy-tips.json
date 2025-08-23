@@ -1,0 +1,94 @@
+{
+  "tips_by_situation": {
+    "preflop": {
+      "early_position": [
+        "Play tight from early position - only premium hands",
+        "Avoid marginal hands like suited connectors from EP",
+        "Consider CSI when deciding between calling and pushing"
+      ],
+      "middle_position": [
+        "Widen your range slightly from middle position",
+        "Look for opportunities to isolate limpers",
+        "Be aware of players yet to act behind you"
+      ],
+      "late_position": [
+        "Take advantage of position with wider opening ranges",
+        "Consider stealing blinds with marginal hands",
+        "Use position to play more speculative hands"
+      ],
+      "short_stack": [
+        "Focus on push/fold strategy when CSI < 10",
+        "Look for spots to double up with strong hands",
+        "Don't waste chips on marginal situations"
+      ]
+    },
+    "postflop": {
+      "flop_play": [
+        "Continuation bet with strong hands and draws",
+        "Consider pot odds when facing bets with draws",
+        "Don't chase without proper odds"
+      ],
+      "turn_play": [
+        "Turn bets are usually stronger than flop bets",
+        "Recalculate your outs and odds",
+        "Consider implied odds for drawing hands"
+      ],
+      "river_play": [
+        "Value bet thin when you likely have best hand",
+        "Don't bluff catch without strong reason",
+        "Size your bets appropriately for value or bluff"
+      ]
+    },
+    "tournament": [
+      "Adjust strategy based on bubble and pay jumps",
+      "Use CSI to determine optimal strategy",
+      "Be more aggressive when antes kick in",
+      "Preserve chips for better spots when deep stacked"
+    ]
+  },
+  "csi_specific_tips": {
+    "0-2": [
+      "Push any two cards from small blind vs big blind",
+      "Look for any reasonable spot to get chips in",
+      "Don't fold in small blind unless facing a call"
+    ],
+    "2-5": [
+      "Push/fold is still primary strategy",
+      "Widen pushing ranges from late position",
+      "Avoid calling raises without very strong hands"
+    ],
+    "5-10": [
+      "Can occasionally call raises with strong hands",
+      "Still primarily push/fold but with tighter ranges",
+      "Look for spots to 3-bet shove"
+    ],
+    "10-15": [
+      "Can start playing some post-flop poker",
+      "Still avoid marginal spots without good odds",
+      "Mix between pushing and raising"
+    ],
+    "15+": [
+      "Can play more standard poker",
+      "Use position and post-flop skills",
+      "Still be aware of CSI for key decisions"
+    ]
+  },
+  "common_mistakes": [
+    "Overvaluing hands out of position",
+    "Chasing draws without proper pot odds", 
+    "Not adjusting for stack sizes (CSI)",
+    "Playing too many hands from early position",
+    "Not being aggressive enough with short stacks",
+    "Calling instead of pushing with short stacks",
+    "Not considering implied odds with drawing hands"
+  ],
+  "key_concepts": [
+    "Position is crucial in poker decision-making",
+    "CSI determines optimal strategy more than hand strength alone",
+    "Pot odds must justify drawing to incomplete hands",
+    "Implied odds consider future betting rounds",
+    "Push/fold becomes optimal when stacks get short",
+    "Tight is right from early position",
+    "Aggression increases equity realization"
+  ]
+}

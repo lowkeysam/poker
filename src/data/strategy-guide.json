@@ -1,0 +1,201 @@
+{
+  "kill_everyone_strategy": {
+    "core_philosophy": "Optimal tournament strategy using mathematical approach based on CSI and Nash equilibrium solutions",
+    "key_concepts": [
+      "CSI (Chip Stacks Index) determines optimal strategy",
+      "Push/fold becomes optimal when stacks get short", 
+      "Position and stack sizes more important than hand strength alone",
+      "Mathematical precision over gut instinct"
+    ]
+  },
+  "csi_strategy_guide": {
+    "csi_0_to_2": {
+      "primary_strategy": "Push or fold only - no other actions",
+      "key_points": [
+        "Push any two cards from small blind vs big blind",
+        "Push very wide from button in heads-up",
+        "Look for any spot to get chips in the middle",
+        "Survival mode - need to double up quickly"
+      ],
+      "common_mistakes": [
+        "Folding in small blind when should push any two",
+        "Being too selective with hands",
+        "Trying to play post-flop poker"
+      ]
+    },
+    "csi_2_to_7": {
+      "primary_strategy": "Primarily push/fold with specific hand ranges",
+      "key_points": [
+        "Use detailed push/fold charts for each position",
+        "Slightly tighter ranges than CSI 0-2",
+        "Can occasionally flat call with premium hands",
+        "Still avoid marginal post-flop situations"
+      ],
+      "adjustments": [
+        "Widen ranges in late position",
+        "Tighten against tight players",
+        "Consider stack sizes of opponents behind"
+      ]
+    },
+    "csi_7_to_12": {
+      "primary_strategy": "Mixed strategy - push/fold and limited post-flop",
+      "key_points": [
+        "Can start playing some post-flop poker",
+        "Still primarily push/fold in many spots",
+        "Use position more aggressively",
+        "Can call raises with strong hands occasionally"
+      ],
+      "post_flop_guidelines": [
+        "Play tight-aggressive style",
+        "Avoid marginal spots without good odds",
+        "C-bet selectively on good boards"
+      ]
+    },
+    "csi_12_plus": {
+      "primary_strategy": "More standard tournament poker",
+      "key_points": [
+        "Can use full range of poker skills",
+        "Still consider CSI for major decisions",
+        "Use position and post-flop play more",
+        "Can play speculative hands in position"
+      ]
+    }
+  },
+  "positional_strategy": {
+    "early_position": {
+      "opening_ranges": "Premium hands only - AA-99, AK, AQ",
+      "csi_adjustments": {
+        "short_stack": "Push with 88+, ATs+, AJo+",
+        "medium_stack": "Can limp with small pairs occasionally",
+        "deep_stack": "Standard tight opening ranges"
+      }
+    },
+    "middle_position": {
+      "opening_ranges": "Slightly wider - add KQ, AJ, smaller pairs",
+      "considerations": [
+        "Players yet to act behind",
+        "Stack sizes of blinds",
+        "Recent table dynamics"
+      ]
+    },
+    "late_position": {
+      "opening_ranges": "Wide ranges - steal attempts common",
+      "button_strategy": [
+        "Very wide pushing ranges when short",
+        "Can play many speculative hands when deep",
+        "Primary stealing position"
+      ],
+      "cutoff_strategy": [
+        "Second best position",
+        "Can isolate weak players",
+        "Good spot for 3-bet bluffs when deep"
+      ]
+    },
+    "blinds": {
+      "small_blind": [
+        "Complete with wide range when folded to",
+        "Defend with proper odds against raises", 
+        "Push very wide when short stacked"
+      ],
+      "big_blind": [
+        "Get good pot odds to call raises",
+        "Can call wider against late position raises",
+        "Push over limpers when stack is short"
+      ]
+    }
+  },
+  "opponent_adjustments": {
+    "tight_players": {
+      "adjustments": [
+        "Push wider against them",
+        "They will fold too often to aggression",
+        "Can steal blinds more frequently",
+        "Call their pushes tighter"
+      ]
+    },
+    "loose_players": {
+      "adjustments": [
+        "Push tighter - they call lighter",
+        "Value bet thinner against them",
+        "Avoid bluffing without strong equity",
+        "Can call their pushes wider"
+      ]
+    },
+    "aggressive_players": {
+      "adjustments": [
+        "Let them do the betting",
+        "Trap with strong hands",
+        "Don't get into raising wars without premium hands",
+        "Use their aggression against them"
+      ]
+    }
+  },
+  "tournament_phases": {
+    "early_levels": {
+      "strategy": "Play tight, build stack slowly",
+      "key_points": [
+        "Deep stacks allow post-flop play",
+        "Avoid marginal spots",
+        "Look for good spots to double up",
+        "Don't risk tournament life without good reason"
+      ]
+    },
+    "middle_levels": {
+      "strategy": "Increase aggression as blinds grow",
+      "key_points": [
+        "Antes make stealing more profitable",
+        "Stack sizes become more critical",
+        "Start using CSI-based strategy more",
+        "Look for accumulation spots"
+      ]
+    },
+    "bubble_phase": {
+      "strategy": "Exploit tight play of others",
+      "key_points": [
+        "Many players tighten up near money",
+        "Can steal more frequently",
+        "Be selective about big confrontations",
+        "ICM considerations become important"
+      ]
+    },
+    "in_the_money": {
+      "strategy": "Adjust for pay jump pressure",
+      "key_points": [
+        "Players may tighten for next pay jump",
+        "Can be more aggressive against medium stacks",
+        "Short stacks become very desperate",
+        "Final table dynamics change everything"
+      ]
+    }
+  },
+  "common_leaks": {
+    "strategic_errors": [
+      "Not adjusting strategy based on CSI",
+      "Playing too many marginal hands early position",
+      "Calling instead of pushing with short stacks",
+      "Not being aggressive enough on the bubble",
+      "Overvaluing hands out of position"
+    ],
+    "mathematical_errors": [
+      "Not calculating pot odds correctly",
+      "Ignoring implied odds with drawing hands",
+      "Misunderstanding CSI calculations",
+      "Not considering opponent stack sizes",
+      "Failing to use push/fold charts"
+    ],
+    "psychological_errors": [
+      "Letting emotions affect decisions",
+      "Playing scared money poker",
+      "Not adjusting to opponent tendencies",
+      "Overvaluing tournament life early",
+      "Not adapting to changing dynamics"
+    ]
+  },
+  "key_formulas": {
+    "csi_calculation": "CSI = Total Chips / (Small Blind + Big Blind + Antes per hand)",
+    "pot_odds": "Odds = (Pot Size + Opponent Bet) / Amount to Call",
+    "equity_needed": "Equity % = 1 / (Pot Odds + 1)",
+    "implied_odds": "Consider future betting when drawing to strong hands",
+    "chip_ev": "In tournaments, consider ICM not just chip accumulation"
+  }
+}

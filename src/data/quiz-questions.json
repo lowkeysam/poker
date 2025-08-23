@@ -1,0 +1,140 @@
+{
+  "categories": {
+    "hand_odds": {
+      "description": "Questions about calculating hand equity and win probability",
+      "questions": [
+        {
+          "id": "ho_1",
+          "question": "You have A♠K♠ on a flop of Q♠J♠2♣. How many outs do you have?",
+          "type": "numeric",
+          "answer": 12,
+          "explanation": "9 spades for flush + 3 tens for straight = 12 outs",
+          "difficulty": "beginner"
+        },
+        {
+          "id": "ho_2", 
+          "question": "With A♥K♦ vs Q♣Q♠ preflop, what's your approximate equity?",
+          "type": "percentage",
+          "answer": 43,
+          "explanation": "AK vs QQ is roughly 43% vs 57% preflop",
+          "difficulty": "intermediate"
+        },
+        {
+          "id": "ho_3",
+          "question": "You have 8♠9♠ on T♣J♦2♠. How many outs for a straight?",
+          "type": "numeric", 
+          "answer": 8,
+          "explanation": "4 sevens + 4 queens = 8 outs for straight",
+          "difficulty": "beginner"
+        }
+      ]
+    },
+    "pot_odds": {
+      "description": "Questions about pot odds calculations",
+      "questions": [
+        {
+          "id": "po_1",
+          "question": "Pot is $100, opponent bets $50. What pot odds are you getting?",
+          "type": "ratio",
+          "answer": "3:1",
+          "explanation": "You need to call $50 to win $150 (pot + bet) = 3:1 odds",
+          "difficulty": "beginner"
+        },
+        {
+          "id": "po_2",
+          "question": "Getting 3:1 pot odds, what's the minimum equity you need to call?",
+          "type": "percentage",
+          "answer": 25,
+          "explanation": "3:1 odds = 1/(3+1) = 25% equity needed",
+          "difficulty": "intermediate"
+        },
+        {
+          "id": "po_3",
+          "question": "Pot $200, opponent bets $100, you need 30% equity. Should you call?",
+          "type": "boolean",
+          "answer": true,
+          "explanation": "Pot odds: 2:1 = 33.3% equity needed. You have 30%, so fold.",
+          "difficulty": "intermediate"
+        }
+      ]
+    },
+    "implied_odds": {
+      "description": "Questions about implied odds and future betting",
+      "questions": [
+        {
+          "id": "io_1",
+          "question": "You're drawing to nuts with 20% equity. Pot odds only give you 2:1 (33% needed). Opponent has $200 behind. What implied odds do you need?",
+          "type": "ratio",
+          "answer": "4:1",
+          "explanation": "Need 20% equity = 4:1 odds. Currently getting 2:1, so need to win extra $100 on future streets.",
+          "difficulty": "advanced"
+        }
+      ]
+    },
+    "csi": {
+      "description": "Questions about CSI calculations and strategy",
+      "questions": [
+        {
+          "id": "csi_1",
+          "question": "You have 2000 chips, blinds are 100/200. What's your CSI?",
+          "type": "numeric",
+          "answer": 6.7,
+          "explanation": "CSI = Stack / (Small blind + Big blind + Antes). 2000/(100+200) = 6.67",
+          "difficulty": "beginner"
+        },
+        {
+          "id": "csi_2",
+          "question": "With CSI of 4, what's your primary strategy?",
+          "type": "multiple_choice",
+          "options": ["Push/fold only", "Normal play", "Tight play", "Bluff more"],
+          "answer": 0,
+          "explanation": "CSI under 5 means you should primarily use push/fold strategy",
+          "difficulty": "intermediate"
+        },
+        {
+          "id": "csi_3",
+          "question": "Heads up, button, CSI of 3. Should you push with K♠7♦?",
+          "type": "boolean",
+          "answer": true,
+          "explanation": "With CSI 3 heads up on button, K7o is a clear push according to optimal strategy",
+          "difficulty": "intermediate"
+        }
+      ]
+    },
+    "equity": {
+      "description": "Questions about equity calculations",
+      "questions": [
+        {
+          "id": "eq_1",
+          "question": "You have 9 outs with 2 cards to come. What's your approximate equity?",
+          "type": "percentage",
+          "answer": 35,
+          "explanation": "9 outs × 4% = 36% (rule of 4 and 2)",
+          "difficulty": "beginner"
+        },
+        {
+          "id": "eq_2",
+          "question": "A♠A♥ vs K♣Q♦ preflop equity is approximately?",
+          "type": "percentage", 
+          "answer": 70,
+          "explanation": "Pocket aces vs two overcards is roughly 70-30%",
+          "difficulty": "beginner"
+        }
+      ]
+    }
+  },
+  "difficulty_levels": {
+    "beginner": {
+      "description": "Basic calculations and concepts",
+      "time_limit": 30
+    },
+    "intermediate": {
+      "description": "More complex scenarios requiring deeper understanding",
+      "time_limit": 45
+    },
+    "advanced": {
+      "description": "Complex multi-step calculations",
+      "time_limit": 60
+    }
+  }
+}

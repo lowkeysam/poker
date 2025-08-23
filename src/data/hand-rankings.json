@@ -1,0 +1,74 @@
+{
+  "rankings": [
+    {
+      "rank": 1,
+      "name": "Royal Flush",
+      "description": "A, K, Q, J, 10, all the same suit",
+      "examples": ["A♠ K♠ Q♠ J♠ T♠", "A♥ K♥ Q♥ J♥ T♥"],
+      "probability": 0.000154
+    },
+    {
+      "rank": 2,
+      "name": "Straight Flush",
+      "description": "Five cards in a sequence, all the same suit",
+      "examples": ["9♣ 8♣ 7♣ 6♣ 5♣", "K♦ Q♦ J♦ T♦ 9♦"],
+      "probability": 0.00139
+    },
+    {
+      "rank": 3,
+      "name": "Four of a Kind",
+      "description": "Four cards of the same rank",
+      "examples": ["A♠ A♥ A♦ A♣ K♠", "8♠ 8♥ 8♦ 8♣ Q♣"],
+      "probability": 0.024
+    },
+    {
+      "rank": 4,
+      "name": "Full House",
+      "description": "Three of a kind with a pair",
+      "examples": ["A♠ A♥ A♦ K♣ K♠", "8♠ 8♥ 8♦ 3♣ 3♠"],
+      "probability": 0.144
+    },
+    {
+      "rank": 5,
+      "name": "Flush",
+      "description": "Five cards all the same suit, not in sequence",
+      "examples": ["A♠ J♠ 9♠ 6♠ 4♠", "K♥ Q♥ 8♥ 6♥ 3♥"],
+      "probability": 0.197
+    },
+    {
+      "rank": 6,
+      "name": "Straight",
+      "description": "Five cards in sequence, not all the same suit",
+      "examples": ["A♠ K♥ Q♦ J♣ T♠", "8♠ 7♥ 6♦ 5♣ 4♠"],
+      "probability": 0.392
+    },
+    {
+      "rank": 7,
+      "name": "Three of a Kind",
+      "description": "Three cards of the same rank",
+      "examples": ["A♠ A♥ A♦ K♣ Q♠", "8♠ 8♥ 8♦ J♣ 7♠"],
+      "probability": 2.11
+    },
+    {
+      "rank": 8,
+      "name": "Two Pair",
+      "description": "Two different pairs",
+      "examples": ["A♠ A♥ K♦ K♣ Q♠", "8♠ 8♥ 3♦ 3♣ J♠"],
+      "probability": 4.75
+    },
+    {
+      "rank": 9,
+      "name": "One Pair",
+      "description": "Two cards of the same rank",
+      "examples": ["A♠ A♥ K♦ Q♣ J♠", "8♠ 8♥ A♦ K♣ Q♠"],
+      "probability": 42.3
+    },
+    {
+      "rank": 10,
+      "name": "High Card",
+      "description": "When you haven't made any of the hands above",
+      "examples": ["A♠ K♥ Q♦ J♣ 9♠", "K♠ Q♥ J♦ 9♣ 7♠"],
+      "probability": 50.1
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "description": "Detailed CSI (Chip Stacks Index) push/fold charts based on Kill Everyone strategy with specific hand ranges",
+  "key_concepts": {
+    "csi_calculation": "CSI = Total Chips / (Small Blind + Big Blind + Antes)",
+    "strategy_thresholds": {
+      "0-2": "Push any two cards in most situations",
+      "2-7": "Primarily push/fold with specific ranges",
+      "7-12": "Mixed strategy - some post-flop play possible",
+      "12+": "More standard poker with position consideration"
+    },
+    "important_notes": [
+      "Charts assume players will call optimally",
+      "Adjust for tighter/looser opponents",
+      "Position is crucial - later position = wider ranges",
+      "Consider ICM implications in tournaments"
+    ]
+  },
+  "detailed_push_charts": {
+    "csi_5_push": {
+      "description": "Calling a 5 CSI Push (card)",
+      "positions": {
+        "small_blind": {
+          "no_antes": {
+            "vs_3_off": "22+,A2o+,K9s+,K9o+,Q9s+,Q9o+,J9s+,JTo+,T9s+,98s+,87s+,76s+,65s+,54s+",
+            "vs_4_off": "22+,A2o+,K3s+,K9o+,Q8s+,QTo+,J8s+,JTo+,T8s+,T9o+,97s+,98o+,86s+,87o+,75s+,76o",
+            "vs_5_off": "22+,A2o+,K6s+,KTo+,Q8s+,QTo+,J8s+,JTo+,T8s+,T9o+,97s+,98o+,86s+,87o+,75s+,76o+,64s+,65o",
+            "vs_6_off": "22+,A2o+,K8s+,KJo+,Q9s+,QJo+,J9s+,JTo+,T9s+,98s+,87s+,76s+,65s+,54s+",
+            "vs_7_off": "22+,A2o+,K9s+,KJo+,Q9s+,QJo+,J9s+,JTo+,T9s+,98s+,87s+,76s+,65s+,54s+"
+          }
+        },
+        "big_blind": {
+          "no_antes": {
+            "vs_3_off": "22+,A2o+,K6s+,K9o+,Q8s+,Q9o+,J8s+,J9o+,T8s+,T9o+,97s+,98o+,86s+,87o+,75s+,76o+,64s+,65o+,53s+,54o",
+            "vs_4_off": "22+,A2o+,K3s+,K9o+,Q6s+,Q9o+,J7s+,J9o+,T7s+,T8o+,96s+,97o+,85s+,86o+,74s+,75o+,63s+,64o",
+            "vs_5_off": "22+,A2o+,K3s+,K8o+,Q5s+,Q8o+,J6s+,J8o+,T6s+,T8o+,95s+,96o+,84s+,85o+,73s+,74o+,62s+,63o",
+            "vs_6_off": "22+,A5o+,K6s+,K9o+,Q8s+,Q9o+,J8s+,J9o+,T8s+,T9o+,97s+,98o+,86s+,87o+,75s+,76o+,64s+,65o",
+            "vs_7_off": "33+,A7o+,K8s+,KTo+,Q8s+,Q9o+,J8s+,J9o+,T8s+,T9o+,97s+,98o+,86s+,87o+,75s+,76o+,64s+,65o"
+          }
+        }
+      }
+    },
+    "csi_7_push": {
+      "description": "Calling a 7 CSI Push (card)",
+      "positions": {
+        "small_blind": {
+          "no_antes": {
+            "vs_3_off": "44+,A9o+,A7s+,K9s+,KTo+,Q9s+,QJo,J9s+,JTo,T9s,98s",
+            "vs_4_off": "33+,A8o+,A5s+,K8s+,KTo+,Q8s+,QTo+,J8s+,JTo+,T8s+,T9o,97s+,98o,86s+,87o,75s+,76o",
+            "vs_5_off": "33+,A7o+,A4s+,K7s+,K9o+,Q7s+,Q9o+,J7s+,J9o+,T7s+,T9o+,96s+,97o+,85s+,86o+,74s+,75o+,63s+,64o",
+            "vs_6_off": "22+,A6o+,A3s+,K6s+,K8o+,Q6s+,Q8o+,J6s+,J8o+,T6s+,T8o+,95s+,96o+,84s+,85o+,73s+,74o+,62s+,63o",
+            "vs_7_off": "22+,A5o+,A2s+,K5s+,K7o+,Q5s+,Q7o+,J5s+,J7o+,T5s+,T7o+,94s+,95o+,83s+,84o+,72s+,73o+,62s"
+          }
+        },
+        "big_blind": {
+          "no_antes": {
+            "vs_3_off": "22+,A2o+,K6s+,K9o+,Q8s+,Q9o+,J8s+,J9o+,T8s+,T9o+,97s+,98o+,86s+,87o+,75s+,76o+,64s+,65o+,53s+,54o",
+            "vs_4_off": "22+,A2o+,K3s+,K8o+,Q5s+,Q8o+,J6s+,J8o+,T6s+,T8o+,95s+,96o+,84s+,85o+,73s+,74o+,62s+,63o",
+            "vs_5_off": "22+,A2o+,K2s+,K7o+,Q4s+,Q7o+,J5s+,J7o+,T5s+,T7o+,94s+,95o+,83s+,84o+,72s+,73o+,62s",
+            "vs_6_off": "22+,A2o+,K2s+,K6o+,Q3s+,Q6o+,J4s+,J6o+,T4s+,T6o+,93s+,94o+,82s+,83o+,71s+,72o+,61s",
+            "vs_7_off": "22+,A2o+,K2s+,K5o+,Q2s+,Q5o+,J3s+,J5o+,T3s+,T5o+,92s+,93o+,81s+,82o+,70s+,71o+,60s"
+          }
+        }
+      }
+    },
+    "equilibrium_solutions": {
+      "description": "Nash equilibrium solutions for heads-up play",
+      "suited_hands": {
+        "push_ranges_by_position": {
+          "button": {
+            "csi_2": "A2s+,K2s+,Q2s+,J2s+,T2s+,92s+,82s+,72s+,62s+,52s+,42s+,32s+",
+            "csi_3": "A2s+,K2s+,Q2s+,J2s+,T4s+,94s+,84s+,74s+,64s+,54s+,43s+",
+            "csi_4": "A2s+,K2s+,Q2s+,J3s+,T6s+,96s+,86s+,75s+,65s+,54s+",
+            "csi_5": "A2s+,K2s+,Q4s+,J7s+,T8s+,98s+,87s+,76s+",
+            "csi_6": "A2s+,K3s+,Q6s+,J8s+,T9s+,98s+",
+            "csi_7": "A2s+,K5s+,Q8s+,JTs+",
+            "csi_8": "A3s+,K7s+,QTs+",
+            "csi_9": "A5s+,K9s+,QTs+",
+            "csi_10": "A7s+,KTs+"
+          },
+          "big_blind_call": {
+            "vs_csi_2": "A6s+,K8s+,Q9s+,J9s+,T9s+,98s+,87s+,76s+,65s+",
+            "vs_csi_3": "A7s+,K9s+,QTs+,JTs+,T9s+,98s+,87s+",
+            "vs_csi_4": "A8s+,KTs+,QJs+,JTs+,T9s+,98s+",
+            "vs_csi_5": "A9s+,KJs+,QJs+,JTs+,T9s+",
+            "vs_csi_6": "ATs+,KQs,QJs+,JTs+",
+            "vs_csi_7": "AJs+,KQs,QJs+",
+            "vs_csi_8": "AQs+,KQs",
+            "vs_csi_9": "AQs+",
+            "vs_csi_10": "AKs"
+          }
+        }
+      },
+      "offsuit_hands": {
+        "push_ranges_by_position": {
+          "button": {
+            "csi_2": "A2o+,K2o+,Q2o+,J2o+,T2o+,92o+,82o+,72o+,62o+,52o+,42o+,32o+",
+            "csi_3": "A2o+,K2o+,Q3o+,J7o+,T8o+,98o+,87o+,76o+,65o+",
+            "csi_4": "A2o+,K4o+,Q8o+,J9o+,T9o+,98o+",
+            "csi_5": "A3o+,K7o+,Q9o+,JTo+,T9o+",
+            "csi_6": "A5o+,K9o+,QTo+,JTo+",
+            "csi_7": "A7o+,KTo+,QJo+",
+            "csi_8": "A9o+,KJo+,QJo+",
+            "csi_9": "ATo+,KQo+",
+            "csi_10": "AJo+"
+          }
+        }
+      }
+    }
+  },
+  "calling_ranges_detailed": {
+    "description": "Detailed calling ranges based on assumed rank order",
+    "rank_order_for_calling": {
+      "top_5_percent": ["AA", "KK", "QQ", "JJ", "AKs", "TT", "AQs", "AJs", "KQs", "AKo", "99", "ATs", "AQo", "KJs", "88", "KTs", "QJs", "AJo", "KQo", "77"],
+      "top_10_percent": ["AA", "KK", "QQ", "JJ", "AKs", "TT", "AQs", "AJs", "KQs", "AKo", "99", "ATs", "AQo", "KJs", "88", "KTs", "QJs", "AJo", "KQo", "77", "A9s", "66", "AT", "A8s", "KJo", "55", "QTs", "A7s", "KTo", "A9o", "A6s", "QJo", "64s", "K9s", "T9s", "A5s", "A8o", "K8s", "98s", "T8s", "K9o", "A7o", "Q9s"],
+      "top_15_percent": "Extends the above with more marginal hands",
+      "top_20_percent": "Further extension including suited connectors and more pairs"
+    }
+  },
+  "advanced_concepts": {
+    "post_flop_transition": {
+      "csi_threshold": 7,
+      "description": "When CSI > 7, can start incorporating post-flop play",
+      "key_adjustments": [
+        "Can call raises with speculative hands in position", 
+        "More standard c-betting frequencies",
+        "Consider implied odds for drawing hands"
+      ]
+    },
+    "ante_adjustments": {
+      "description": "With antes in play, ranges should be wider",
+      "multiplier": 1.2,
+      "note": "Increase pushing and calling ranges by approximately 20% when antes are present"
+    },
+    "bubble_considerations": {
+      "tighten_calling": "Reduce calling ranges by 15-25% near bubble",
+      "push_more": "Can push slightly wider to exploit tight callers",
+      "icm_pressure": "Consider pay jump implications"
+    }
+  }
+}
