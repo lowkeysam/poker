@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { GameSettings, GameState, Player, QuizQuestion } from '@/lib/types';
+import { useState, useEffect, useCallback } from 'react';
+import { GameSettings, GameState, QuizQuestion, Action } from '@/lib/types';
 import { PokerGame } from '@/lib/game-engine/game';
 import PokerTable from '@/components/game/Table';
 import GameControls from '@/components/game/Controls';
@@ -35,7 +35,18 @@ export default function PokerTrainer() {
   const [showPotOddsCalculator, setShowPotOddsCalculator] = useState(false);
   const [calculateBeforeBet, setCalculateBeforeBet] = useState(false);
   const [pendingAction, setPendingAction] = useState<{action: string, amount?: number} | null>(null);
-  const [settings, setSettings] = useState<GameSettings>(defaultSettings);
+  const [settings] = useState<GameSettings>(defaultSettings);
+  
+  // AI player automation
+  const triggerAIPlayerIfNeeded = useCallback(() => {
+    if (!game || !gameState) return;
+    
+    const currentPlayer = game.getCurrentPlayer();
+    if (currentPlayer && !currentPlayer.isHuman && !currentPlayer.isFolded && !currentPlayer.isAllIn) {
+      // It's an AI player's turn - trigger automatic play
+      game.startAIActions();
+    }
+  }, [game, gameState]);
   
   // Polling to update game state when AI players act
   useEffect(() => {
@@ -53,7 +64,7 @@ export default function PokerTrainer() {
     }, 500); // Check every 500ms
     
     return () => clearInterval(pollGameState);
-  }, [game, gameState]);
+  }, [game, gameState, triggerAIPlayerIfNeeded]);
 
   // Initialize game
   useEffect(() => {
@@ -69,7 +80,7 @@ export default function PokerTrainer() {
         newGame.startAIActions();
       }
     }, 500);
-  }, []);
+  }, [settings]);
 
   // Handle player actions
   const handleAction = (action: string, amount?: number) => {
@@ -103,7 +114,7 @@ export default function PokerTrainer() {
   const executeAction = (action: string, amount?: number) => {
     if (!game) return;
 
-    const actionMap: { [key: string]: any } = {
+    const actionMap: Record<string, Action> = {
       'fold': 'fold',
       'check': 'check', 
       'call': 'call',
@@ -134,17 +145,6 @@ export default function PokerTrainer() {
         // Trigger AI player turn after human action
         triggerAIPlayerIfNeeded();
       }
-    }
-  };
-
-  // AI player automation
-  const triggerAIPlayerIfNeeded = () => {
-    if (!game || !gameState) return;
-    
-    const currentPlayer = game.getCurrentPlayer();
-    if (currentPlayer && !currentPlayer.isHuman && !currentPlayer.isFolded && !currentPlayer.isAllIn) {
-      // It's an AI player's turn - trigger automatic play
-      game.startAIActions();
     }
   };
 
@@ -190,7 +190,7 @@ export default function PokerTrainer() {
     };
   };
 
-  const handleQuizAnswer = (answer: any) => {
+  const handleQuizAnswer = (answer: string | number | boolean) => {
     // Handle quiz answer here
     console.log('Quiz answer:', answer);
     setCurrentQuiz(null);
@@ -276,8 +276,6 @@ export default function PokerTrainer() {
             <div className="flex-1 min-h-[450px] flex items-center justify-center">
               <PokerTable 
                 gameState={gameState}
-                onAction={handleAction}
-                settings={settings}
               />
             </div>
             
@@ -333,7 +331,7 @@ export default function PokerTrainer() {
                 <CSICalculatorSimple
                   gameState={gameState}
                   humanPlayer={gameState.players.find(p => p.isHuman)!}
-                  onComplete={(csi) => {
+                  onComplete={() => {
                     setShowCSICalculator(false);
                     if (pendingAction) {
                       executeAction(pendingAction.action, pendingAction.amount);
@@ -402,7 +400,7 @@ export default function PokerTrainer() {
         <CSICalculatorSimple
           gameState={gameState}
           humanPlayer={gameState.players.find(p => p.isHuman)!}
-          onComplete={(csi) => {
+          onComplete={() => {
             setShowCSICalculatorModal(false);
             if (pendingAction) {
               executeAction(pendingAction.action, pendingAction.amount);

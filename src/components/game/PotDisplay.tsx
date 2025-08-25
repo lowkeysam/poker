@@ -1,15 +1,13 @@
 "use client";
 
-import { GameStage } from '@/lib/types';
 
 interface PotDisplayProps {
   pot: number;
-  stage: GameStage;
   smallBlind: number;
   bigBlind: number;
 }
 
-export default function PotDisplay({ pot, stage, smallBlind, bigBlind }: PotDisplayProps) {
+export default function PotDisplay({ pot, smallBlind, bigBlind }: PotDisplayProps) {
   if (pot === 0) return null;
 
   return (

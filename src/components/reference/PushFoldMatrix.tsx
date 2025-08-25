@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Card } from '@/lib/types';
+import { Card, Rank } from '@/lib/types';
 import { getRankValue } from '@/lib/game-engine/deck';
 
 interface PushFoldMatrixProps {
@@ -158,33 +158,6 @@ const OFFSUIT_STRATEGY: Record<string, Record<string, HandStrategy>> = {
   }
 };
 
-// Heads-up specific ranges for 3BB raises (from IMG_7569 - page 185)
-const HEADSUP_3BB_SUITED: Record<string, Record<string, HandStrategy>> = {
-  // More aggressive heads-up ranges
-  'A': {
-    'A': { action: 'JAM' }, 'K': { action: 'JAM' }, 'Q': { action: 'JAM' }, 'J': { action: 'JAM' },
-    'T': { action: 'JAM' }, '9': { action: 'JAM' }, '8': { action: 'JAM' }, '7': { action: 'JAM' },
-    '6': { action: 'JAM' }, '5': { action: 'JAM' }, '4': { action: 'JAM' }, '3': { action: 'JAM' }, '2': { action: 'JAM' }
-  },
-  // Additional ranges for heads-up play (more liberal calling ranges)
-};
-
-// Equilibrium calling ranges (from IMG_7564 - suited hands calling strategy)
-const CALLING_RANGES_SUITED: Record<string, Record<string, number>> = {
-  // Shows the CSI levels at which to call with each suited hand
-  'A': { 'K': 8, 'Q': 8, 'J': 8, 'T': 8, '9': 8, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2 },
-  'K': { 'Q': 8, 'J': 8, 'T': 8, '9': 7, '8': 6, '7': 5, '6': 4, '5': 3, '4': 3, '3': 2, '2': 2 },
-  'Q': { 'J': 8, 'T': 8, '9': 7, '8': 6, '7': 5, '6': 4, '5': 3, '4': 3, '3': 2, '2': 2 },
-  'J': { 'T': 8, '9': 7, '8': 6, '7': 5, '6': 4, '5': 4, '4': 3, '3': 3, '2': 2 },
-  'T': { '9': 8, '8': 7, '7': 6, '6': 5, '5': 4, '4': 4, '3': 3, '2': 2 },
-  '9': { '8': 8, '7': 8, '6': 6, '5': 4, '4': 3, '3': 2, '2': 2 },
-  '8': { '7': 8, '6': 8, '5': 5, '4': 4, '3': 3, '2': 2 },
-  '7': { '6': 8, '5': 8, '4': 7, '3': 5, '2': 4 },
-  '6': { '5': 8, '4': 8, '3': 8, '2': 6 },
-  '5': { '4': 8, '3': 8, '2': 8 },
-  '4': { '3': 8, '2': 8 },
-  '3': { '2': 8 }
-};
 
 // Legacy push ranges converted from new strategy for backwards compatibility
 const PUSH_RANGES: Record<string, Record<string, string[]>> = {
@@ -255,12 +228,12 @@ export default function PushFoldMatrix({ playerHoleCards, csi, position, onClose
     const rank2 = getRankValue(card2.rank);
     const suited = card1.suit === card2.suit;
     
-    let row = RANKS.findIndex(r => getRankValue(r as any) === Math.max(rank1, rank2));
-    let col = RANKS.findIndex(r => getRankValue(r as any) === Math.min(rank1, rank2));
+    let row = RANKS.findIndex(r => getRankValue(r as Rank) === Math.max(rank1, rank2));
+    let col = RANKS.findIndex(r => getRankValue(r as Rank) === Math.min(rank1, rank2));
     
     // For pairs, they're on the diagonal
     if (rank1 === rank2) {
-      row = col = RANKS.findIndex(r => getRankValue(r as any) === rank1);
+      row = col = RANKS.findIndex(r => getRankValue(r as Rank) === rank1);
     } else if (!suited) {
       // For offsuit hands, swap to lower triangle
       [row, col] = [col, row];
@@ -269,61 +242,6 @@ export default function PushFoldMatrix({ playerHoleCards, csi, position, onClose
     return { row, col };
   };
 
-  // Get the strategy action for a hand combination using Kill Everyone data
-  const getHandStrategy = (row: number, col: number): { action: Action; color: string } => {
-    const rank1 = RANKS[row];
-    const rank2 = RANKS[col];
-    
-    // Determine if suited, offsuit, or pair
-    const isSuited = row < col;
-    const isPair = row === col;
-    const isOffsuit = row > col;
-    
-    let strategy: HandStrategy;
-    
-    if (strategyMode === 'jam_call_fold') {
-      // Use the complete Kill Everyone strategy matrices
-      if (isPair || isSuited) {
-        strategy = SUITED_STRATEGY[rank1]?.[rank2] || { action: 'FOLD' };
-      } else {
-        // For offsuit, use the lower triangle logic
-        strategy = OFFSUIT_STRATEGY[RANKS[col]]?.[RANKS[row]] || { action: 'FOLD' };
-      }
-    } else if (strategyMode === 'equilibrium') {
-      // Use calling ranges based on CSI
-      const currentCSI = parseFloat(selectedCSIRange.split('_')[1]) || 5;
-      if (isSuited || isPair) {
-        const minCSI = CALLING_RANGES_SUITED[rank1]?.[rank2] || 10;
-        strategy = { action: currentCSI >= minCSI ? 'CALL' : 'FOLD' };
-      } else {
-        strategy = { action: 'FOLD' }; // Conservative for offsuit in equilibrium
-      }
-    } else {
-      // Legacy push/fold mode
-      const shouldPushResult = shouldPush(row, col);
-      strategy = { action: shouldPushResult ? 'JAM' : 'FOLD' };
-    }
-    
-    // Apply heads-up adjustments
-    if (isHeadsUp && raiseSize === '3BB') {
-      // More aggressive heads-up ranges
-      if (isPair || isSuited) {
-        strategy = HEADSUP_3BB_SUITED[rank1]?.[rank2] || strategy;
-      }
-    }
-    
-    // Return color based on action
-    switch (strategy.action) {
-      case 'JAM': return { action: strategy.action, color: 'bg-green-500' };
-      case 'CALL': return { action: strategy.action, color: 'bg-blue-500' };
-      case 'FOLD': return { action: strategy.action, color: 'bg-red-500' };
-      case 'RF': return { action: strategy.action, color: 'bg-yellow-500' }; // Raise or fold
-      case 'LC': return { action: strategy.action, color: 'bg-purple-500' }; // Limp or call
-      case 'LR': return { action: strategy.action, color: 'bg-orange-500' }; // Limp or raise
-      default: return { action: 'FOLD', color: 'bg-red-500' };
-    }
-  };
-  
   // Get action for a hand using detailed Kill Everyone data
   const getHandAction = (row: number, col: number): { action: Action; ratio?: string; color: string } => {
     const rank1 = RANKS[row];
@@ -420,8 +338,8 @@ export default function PushFoldMatrix({ playerHoleCards, csi, position, onClose
     // Handle pairs
     if (baseHand.length === 2 && baseHand[0] === baseHand[1]) {
       if (handString.length === 2 && handString[0] === handString[1]) {
-        const handRank = getRankValue(handString[0] as any);
-        const baseRank = getRankValue(baseHand[0] as any);
+        const handRank = getRankValue(handString[0] as Rank);
+        const baseRank = getRankValue(baseHand[0] as Rank);
         return handRank >= baseRank;
       }
       return false;
@@ -434,10 +352,10 @@ export default function PushFoldMatrix({ playerHoleCards, csi, position, onClose
       
       if (handSuited !== baseSuited) return false;
       
-      const handRank1 = getRankValue(handString[0] as any);
-      const handRank2 = getRankValue(handString[1] as any);
-      const baseRank1 = getRankValue(baseHand[0] as any);
-      const baseRank2 = getRankValue(baseHand[1] as any);
+      const handRank1 = getRankValue(handString[0] as Rank);
+      const handRank2 = getRankValue(handString[1] as Rank);
+      const baseRank1 = getRankValue(baseHand[0] as Rank);
+      const baseRank2 = getRankValue(baseHand[1] as Rank);
       
       if (baseRank1 === 14) { // Ace hands
         return handRank1 === 14 && handRank2 >= baseRank2;
@@ -461,7 +379,7 @@ export default function PushFoldMatrix({ playerHoleCards, csi, position, onClose
             <label className="block text-base font-bold text-gray-900 mb-2">Strategy Mode:</label>
             <select
               value={strategyMode}
-              onChange={(e) => setStrategyMode(e.target.value as any)}
+              onChange={(e) => setStrategyMode(e.target.value as 'push_fold' | 'jam_call_fold' | 'equilibrium')}
               className="px-4 py-2 border-2 border-gray-400 rounded-md text-base font-medium bg-white text-gray-900"
             >
               <option value="push_fold">Push/Fold (Legacy)</option>
@@ -505,7 +423,7 @@ export default function PushFoldMatrix({ playerHoleCards, csi, position, onClose
             <label className="block text-base font-bold text-gray-900 mb-2">Raise Size:</label>
             <select
               value={raiseSize}
-              onChange={(e) => setRaiseSize(e.target.value as any)}
+              onChange={(e) => setRaiseSize(e.target.value as '2BB' | '2.5BB' | '3BB')}
               className="px-4 py-2 border-2 border-gray-400 rounded-md text-base font-medium bg-white text-gray-900"
             >
               <option value="2BB">2.0 BB</option>

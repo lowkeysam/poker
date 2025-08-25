@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { GameState, Player, Card } from '@/lib/types';
-import { calculateEquity, calculateOuts } from '@/lib/calculators/odds';
+import { GameState, Player } from '@/lib/types';
+import { calculateEquity } from '@/lib/calculators/odds';
 
 interface OddsCalculatorProps {
   gameState: GameState;

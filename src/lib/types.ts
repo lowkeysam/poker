@@ -69,7 +69,7 @@ export interface QuizQuestion {
   id: string;
   question: string;
   type: QuizQuestionType;
-  answer: any;
+  answer: string | number | boolean;
   options?: string[]; // for multiple choice
   explanation: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
@@ -78,7 +78,7 @@ export interface QuizQuestion {
 
 export interface QuizResult {
   questionId: string;
-  userAnswer: any;
+  userAnswer: string | number | boolean;
   correct: boolean;
   timeSpent: number;
 }
@@ -168,7 +168,7 @@ export interface PlayerProps {
 
 export interface QuizModalProps {
   question: QuizQuestion;
-  onAnswer: (answer: any) => void;
+  onAnswer: (answer: string | number | boolean) => void;
   onClose: () => void;
   timeLimit?: number;
 }

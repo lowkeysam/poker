@@ -1,6 +1,6 @@
 import { Card, OddsCalculation, PotOdds, ImpliedOdds } from '../types';
 import { evaluateHand, compareHands } from '../game-engine/evaluator';
-import { getAvailableCards, createCard, getRankValue } from '../game-engine/deck';
+import { getAvailableCards, getRankValue } from '../game-engine/deck';
 
 // Calculate hand equity using Monte Carlo simulation
 export function calculateEquity(
@@ -101,8 +101,7 @@ function calculateExactEquity(
 // Calculate outs (cards that improve the hand)
 export function calculateOuts(
   holeCards: Card[],
-  communityCards: Card[],
-  targetHandTypes?: string[]
+  communityCards: Card[]
 ): number {
   if (communityCards.length >= 5) return 0;
   
@@ -129,8 +128,6 @@ export function calculateOuts(
 
 // Calculate odds using the rule of 4 and 2
 export function calculateHandOdds(outs: number, cardsTocome: number): OddsCalculation {
-  const twoCardOdds = outs * 4; // Approximate percentage with 2 cards
-  const oneCardOdds = outs * 2; // Approximate percentage with 1 card
   
   // More accurate calculation
   const exactTwoCard = (1 - (47 - outs) / 47 * (46 - outs) / 46) * 100;

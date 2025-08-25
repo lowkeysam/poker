@@ -1,4 +1,4 @@
-import { Card, Rank, Suit, HandEvaluation } from '../types';
+import { Card, Rank, HandEvaluation } from '../types';
 import { getRankValue } from './deck';
 
 // Hand ranking constants

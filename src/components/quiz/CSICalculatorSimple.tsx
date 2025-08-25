@@ -154,7 +154,7 @@ export default function CSICalculatorSimple({
       {/* CSI Reference */}
       <div className="mt-6 text-base text-gray-800 bg-blue-50 border border-blue-200 p-4 rounded-lg">
         <p className="font-semibold text-blue-800 mb-2">💡 About CSI (Chip Stack Index)</p>
-        <p className="text-blue-900 leading-relaxed font-medium">CSI tells you how many "rounds" you can survive before being blinded out. It's the most important number for tournament strategy!</p>
+        <p className="text-blue-900 leading-relaxed font-medium">CSI tells you how many &quot;rounds&quot; you can survive before being blinded out. It&apos;s the most important number for tournament strategy!</p>
       </div>
     </>
   );

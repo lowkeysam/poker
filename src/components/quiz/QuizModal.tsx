@@ -1,47 +1,33 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { QuizQuestion } from '@/lib/types';
 
 interface QuizModalProps {
   question: QuizQuestion;
-  onAnswer: (answer: any) => void;
+  onAnswer: (answer: string | number | boolean) => void;
   onClose: () => void;
   timeLimit?: number;
 }
 
 export default function QuizModal({ question, onAnswer, onClose, timeLimit = 60 }: QuizModalProps) {
-  const [userAnswer, setUserAnswer] = useState<any>('');
+  const [userAnswer, setUserAnswer] = useState<string | number | boolean>('');
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          handleSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     let correct = false;
     
     switch (question.type) {
       case 'numeric':
-        const numAnswer = parseFloat(userAnswer);
-        const expectedNum = parseFloat(question.answer);
+        const numAnswer = parseFloat(String(userAnswer));
+        const expectedNum = parseFloat(String(question.answer));
         correct = Math.abs(numAnswer - expectedNum) < 0.1; // Allow small tolerance
         break;
       case 'percentage':
-        const pctAnswer = parseFloat(userAnswer);
-        const expectedPct = parseFloat(question.answer);
+        const pctAnswer = parseFloat(String(userAnswer));
+        const expectedPct = parseFloat(String(question.answer));
         correct = Math.abs(pctAnswer - expectedPct) < 2; // Allow 2% tolerance
         break;
       case 'boolean':
@@ -60,7 +46,21 @@ export default function QuizModal({ question, onAnswer, onClose, timeLimit = 60 
     setIsCorrect(correct);
     setShowResult(true);
     onAnswer(userAnswer);
-  };
+  }, [question.type, question.answer, userAnswer, onAnswer]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [handleSubmit]);
 
   const handleClose = () => {
     onClose();
@@ -73,7 +73,7 @@ export default function QuizModal({ question, onAnswer, onClose, timeLimit = 60 
         return (
           <input
             type="number"
-            value={userAnswer}
+            value={String(userAnswer)}
             onChange={(e) => setUserAnswer(e.target.value)}
             className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg text-center"
             placeholder={question.type === 'percentage' ? 'Enter percentage (e.g., 25)' : 'Enter number'}
@@ -130,7 +130,7 @@ export default function QuizModal({ question, onAnswer, onClose, timeLimit = 60 
         return (
           <input
             type="text"
-            value={userAnswer}
+            value={String(userAnswer)}
             onChange={(e) => setUserAnswer(e.target.value)}
             className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg text-center"
             placeholder="Enter ratio (e.g., 3:1)"
@@ -141,7 +141,7 @@ export default function QuizModal({ question, onAnswer, onClose, timeLimit = 60 
         return (
           <input
             type="text"
-            value={userAnswer}
+            value={String(userAnswer)}
             onChange={(e) => setUserAnswer(e.target.value)}
             className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg"
             placeholder="Enter your answer"

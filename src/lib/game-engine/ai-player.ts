@@ -1,6 +1,6 @@
 import { Player, Action, GameState, Card, GameStage } from '../types';
-import { evaluateHand, compareHands, HAND_RANKINGS } from './evaluator';
-import { calculateCSI, shouldPush, shouldCallPush, getCSIInfo, getRecommendedAction } from '../calculators/csi';
+import { evaluateHand } from './evaluator';
+import { calculateCSI, shouldPush, shouldCallPush } from '../calculators/csi';
 import { getRankValue } from './deck';
 
 // AI Player personality types that affect decision making
@@ -106,7 +106,7 @@ export class AIPlayerDecision {
       if (key !== 'name' && typeof this.personality[key as keyof AIPersonality] === 'number') {
         const current = this.personality[key as keyof AIPersonality] as number;
         const adjustment = (Math.random() - 0.5) * variance;
-        (this.personality as any)[key] = Math.max(0, Math.min(1, current + adjustment));
+        (this.personality as Record<string, unknown>)[key] = Math.max(0, Math.min(1, current + adjustment));
       }
     });
   }
@@ -158,7 +158,7 @@ export class AIPlayerDecision {
     const shouldPushHand = shouldPush(
       player.holeCards,
       csi,
-      position as any,
+      (position === 'unknown' ? 'button' : position) as 'early' | 'middle' | 'late' | 'small_blind' | 'big_blind' | 'button',
       gameState.players.filter(p => p.isActive && !p.isFolded).length - 1
     );
 
@@ -167,7 +167,7 @@ export class AIPlayerDecision {
       const shouldCallHand = shouldCallPush(
         player.holeCards,
         csi,
-        position as any,
+        (position === 'unknown' ? 'big_blind' : position) as 'small_blind' | 'big_blind',
         'unknown',
         csi
       );
@@ -299,13 +299,13 @@ export class AIPlayerDecision {
       const rawStrength = evaluation.rank / 10; // Normalize to 0-1
       
       // Adjust for board texture and position
-      const relativeStrength = this.adjustForBoardTexture(rawStrength, communityCards, stage);
+      const relativeStrength = this.adjustForBoardTexture(rawStrength, communityCards);
       
       // Calculate draw potential (simplified)
       const drawPotential = this.calculateDrawPotential(holeCards, communityCards, stage);
       
       // Calculate nut potential
-      const nutPotential = this.calculateNutPotential(evaluation, communityCards);
+      const nutPotential = this.calculateNutPotential(evaluation);
       
       return {
         rawStrength,
@@ -374,7 +374,7 @@ export class AIPlayerDecision {
     };
   }
 
-  private adjustForBoardTexture(rawStrength: number, communityCards: Card[], stage: GameStage): number {
+  private adjustForBoardTexture(rawStrength: number, communityCards: Card[]): number {
     if (communityCards.length < 3) return rawStrength;
     
     // Check for flush draws, straight draws, etc.
@@ -447,7 +447,7 @@ export class AIPlayerDecision {
     return Math.min(drawPotential, 0.8);
   }
 
-  private calculateNutPotential(evaluation: any, communityCards: Card[]): number {
+  private calculateNutPotential(evaluation: { rank: number; name: string; cards: Card[]; kickers: Card[] }): number {
     // Simplified nut potential calculation
     if (evaluation.rank >= 8) return 0.9; // Four of a kind or better
     if (evaluation.rank >= 6) return 0.7; // Flush or full house

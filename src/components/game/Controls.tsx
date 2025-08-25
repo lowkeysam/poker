@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { GameState, Action } from '@/lib/types';
 import { calculateCSI, getRecommendedAction, getCSIStrategyTips } from '@/lib/calculators/csi';
-import { calculateEquity, calculatePotOdds } from '@/lib/calculators/odds';
+import { calculatePotOdds } from '@/lib/calculators/odds';
 
 interface GameControlsProps {
   gameState: GameState;
@@ -31,7 +31,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
     humanPlayer.holeCards,
     csi,
     'unknown', // We'd need to track position better
-    facingAction as any
+    facingAction as 'none' | 'call' | 'raise' | 'all-in'
   );
 
   const handleAction = (action: string) => {

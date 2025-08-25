@@ -12,7 +12,7 @@ export default function HandRankings({ onClose }: HandRankingsProps) {
       <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="bg-gray-800 text-white p-4 rounded-t-xl flex justify-between items-center">
-          <h2 className="text-xl font-bold">Texas Hold'em Hand Rankings</h2>
+          <h2 className="text-xl font-bold">Texas Hold&apos;em Hand Rankings</h2>
           <button
             onClick={onClose}
             className="text-white hover:text-gray-300 text-xl font-bold w-8 h-8 flex items-center justify-center rounded hover:bg-gray-700"
@@ -103,13 +103,13 @@ export default function HandRankings({ onClose }: HandRankingsProps) {
           <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="font-bold text-blue-800 mb-2">🧠 Memory Aids</h3>
             <div className="text-sm text-blue-700 grid md:grid-cols-2 gap-2">
-              <div>• <strong>Royal Flush:</strong> "Royal family" in one suit</div>
+              <div>• <strong>Royal Flush:</strong> &quot;Royal family&quot; in one suit</div>
               <div>• <strong>Straight Flush:</strong> Five in a row, matching suits</div>
-              <div>• <strong>Four of a Kind:</strong> "Quads"</div>
-              <div>• <strong>Full House:</strong> "Full boat" - three plus two</div>
+              <div>• <strong>Four of a Kind:</strong> &quot;Quads&quot;</div>
+              <div>• <strong>Full House:</strong> &quot;Full boat&quot; - three plus two</div>
               <div>• <strong>Flush:</strong> All same suit</div>
               <div>• <strong>Straight:</strong> Five in sequence</div>
-              <div>• <strong>Three of a Kind:</strong> "Trips" or "Set"</div>
+              <div>• <strong>Three of a Kind:</strong> &quot;Trips&quot; or &quot;Set&quot;</div>
               <div>• <strong>Two Pair:</strong> Two different pairs</div>
             </div>
           </div>

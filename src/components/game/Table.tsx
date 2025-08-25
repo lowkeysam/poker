@@ -1,6 +1,6 @@
 "use client";
 
-import { GameState, GameSettings, Player } from '@/lib/types';
+import { GameState } from '@/lib/types';
 import PlayerSeat from './PlayerSeat';
 import CommunityCards from './CommunityCards';
 import PotDisplay from './PotDisplay';
@@ -8,11 +8,9 @@ import { calculateCSI, getCSIInfo } from '@/lib/calculators/csi';
 
 interface TableProps {
   gameState: GameState;
-  onAction: (action: string, amount?: number) => void;
-  settings: GameSettings;
 }
 
-export default function PokerTable({ gameState, onAction, settings }: TableProps) {
+export default function PokerTable({ gameState }: TableProps) {
   const humanPlayer = gameState.players.find(p => p.isHuman);
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
 
@@ -31,7 +29,7 @@ export default function PokerTable({ gameState, onAction, settings }: TableProps
     const radius = 200;
     
     // Adjust positioning based on angle to avoid pot overlap while keeping side players visible
-    let xMultiplier = 0.35;
+    const xMultiplier = 0.35;
     let yMultiplier = 0.25;
     
     // For bottom players (around 90 degrees), push them further away from pot
@@ -59,7 +57,6 @@ export default function PokerTable({ gameState, onAction, settings }: TableProps
           <div className="flex justify-center">
             <PotDisplay 
               pot={gameState.pot}
-              stage={gameState.stage}
               smallBlind={gameState.smallBlind}
               bigBlind={gameState.bigBlind}
             />
@@ -89,9 +86,7 @@ export default function PokerTable({ gameState, onAction, settings }: TableProps
               isCurrentPlayer={isCurrentPlayer}
               isHuman={player.isHuman}
               csiInfo={csiInfo}
-              gameStage={gameState.stage}
               showCards={player.showCards || player.isHuman}
-              onAction={onAction}
               isSmallBlind={isSmallBlind}
               isBigBlind={isBigBlind}
             />

@@ -1,4 +1,4 @@
-import { GameState, Player, Card, GameStage, Action, GameAction, HandResult, GameSettings } from '../types';
+import { GameState, Player, Action, GameAction, HandResult, GameSettings } from '../types';
 import { Deck } from './deck';
 import { evaluateHand, compareHands } from './evaluator';
 import { AIPlayerDecision, AI_PERSONALITIES } from './ai-player';
@@ -553,10 +553,11 @@ export class PokerGame {
   }
 
   // Get AI player stats for debugging
-  public getAIPlayerStats(playerId: string): any {
+  public getAIPlayerStats(playerId: string): { personality: Record<string, unknown>; decisionHistory: unknown[]; stats: Record<string, unknown> } | null {
     const aiPlayer = this.aiPlayers.get(playerId);
     return aiPlayer ? {
       personality: aiPlayer.getPersonality(),
+      decisionHistory: [], // AI player decision history would go here
       stats: aiPlayer.getStats()
     } : null;
   }

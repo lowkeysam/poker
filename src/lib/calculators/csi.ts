@@ -1,5 +1,4 @@
-import { CSIInfo, Player, Card } from '../types';
-import csiChartsData from '../../data/csi-charts-detailed.json';
+import { CSIInfo, Card, Rank } from '../types';
 import { getRankValue } from '../game-engine/deck';
 
 // Calculate CSI (Chip Stacks Index)
@@ -219,8 +218,8 @@ function handInRangeOrBetter(handString: string, baseHand: string): boolean {
   // Handle pairs
   if (baseHand.length === 2 && baseHand[0] === baseHand[1]) {
     if (handString.length === 2 && handString[0] === handString[1]) {
-      const handRank = getRankValue(handString[0] as any);
-      const baseRank = getRankValue(baseHand[0] as any);
+      const handRank = getRankValue(handString[0] as Rank);
+      const baseRank = getRankValue(baseHand[0] as Rank);
       return handRank >= baseRank;
     }
     return false;
@@ -234,10 +233,10 @@ function handInRangeOrBetter(handString: string, baseHand: string): boolean {
     // Must match suit preference
     if (handSuited !== baseSuited) return false;
     
-    const handRank1 = getRankValue(handString[0] as any);
-    const handRank2 = getRankValue(handString[1] as any);
-    const baseRank1 = getRankValue(baseHand[0] as any);
-    const baseRank2 = getRankValue(baseHand[1] as any);
+    const handRank1 = getRankValue(handString[0] as Rank);
+    const handRank2 = getRankValue(handString[1] as Rank);
+    const baseRank1 = getRankValue(baseHand[0] as Rank);
+    const baseRank2 = getRankValue(baseHand[1] as Rank);
     
     // For Ax hands
     if (baseRank1 === 14) {
@@ -257,11 +256,8 @@ export function getRecommendedAction(
   holeCards: Card[],
   csi: number,
   position: string,
-  facingAction: 'none' | 'call' | 'raise' | 'all-in',
-  potOdds?: number
+  facingAction: 'none' | 'call' | 'raise' | 'all-in'
 ): string {
-  const csiInfo = getCSIInfo(csi);
-  
   if (csi <= 2) {
     if (facingAction === 'none') {
       return 'Push any two cards from late position, fold marginal hands from early position';
@@ -271,13 +267,12 @@ export function getRecommendedAction(
   }
   
   if (csi <= 7) {
-    const handString = cardsToHandString(holeCards);
-    const inPushRange = shouldPush(holeCards, csi, position as any);
+    const inPushRange = shouldPush(holeCards, csi, (position === 'unknown' ? 'button' : position) as 'early' | 'middle' | 'late' | 'small_blind' | 'big_blind' | 'button');
     
     if (facingAction === 'none') {
       return inPushRange ? 'Push (all-in)' : 'Fold';
     } else if (facingAction === 'all-in') {
-      const shouldCall = shouldCallPush(holeCards, csi, position as any, 'unknown', csi);
+      const shouldCall = shouldCallPush(holeCards, csi, (position === 'unknown' ? 'big_blind' : position) as 'small_blind' | 'big_blind', 'unknown', csi);
       return shouldCall ? 'Call' : 'Fold';
     }
   }

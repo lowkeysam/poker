@@ -1,6 +1,6 @@
 "use client";
 
-import { Player, GameStage, CSIInfo } from '@/lib/types';
+import { Player, CSIInfo } from '@/lib/types';
 import { cardToString } from '@/lib/game-engine/deck';
 
 interface PlayerSeatProps {
@@ -9,9 +9,7 @@ interface PlayerSeatProps {
   isCurrentPlayer: boolean;
   isHuman: boolean;
   csiInfo: CSIInfo;
-  gameStage: GameStage;
   showCards: boolean;
-  onAction: (action: string, amount?: number) => void;
   isSmallBlind?: boolean;
   isBigBlind?: boolean;
 }
@@ -22,9 +20,7 @@ export default function PlayerSeat({
   isCurrentPlayer,
   isHuman,
   csiInfo,
-  gameStage,
   showCards,
-  onAction,
   isSmallBlind = false,
   isBigBlind = false
 }: PlayerSeatProps) {
