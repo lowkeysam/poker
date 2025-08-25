@@ -6,7 +6,7 @@ import { PokerGame } from '@/lib/game-engine/game';
 import PokerTable from '@/components/game/Table';
 import GameControls from '@/components/game/Controls';
 import QuizModal from '@/components/quiz/QuizModal';
-import CSICalculator from '@/components/quiz/CSICalculator';
+import CSICalculatorSimple from '@/components/quiz/CSICalculatorSimple';
 import OddsCalculator from '@/components/quiz/OddsCalculator';
 import HandRankings from '@/components/reference/HandRankings';
 import PushFoldMatrix from '@/components/reference/PushFoldMatrix';
@@ -30,10 +30,30 @@ export default function PokerTrainer() {
   const [showHandRankings, setShowHandRankings] = useState(false);
   const [showPushFoldMatrix, setShowPushFoldMatrix] = useState(false);
   const [showCSICalculator, setShowCSICalculator] = useState(false);
+  const [showCSICalculatorModal, setShowCSICalculatorModal] = useState(false);
   const [showOddsCalculator, setShowOddsCalculator] = useState(false);
+  const [showPotOddsCalculator, setShowPotOddsCalculator] = useState(false);
   const [calculateBeforeBet, setCalculateBeforeBet] = useState(false);
   const [pendingAction, setPendingAction] = useState<{action: string, amount?: number} | null>(null);
   const [settings, setSettings] = useState<GameSettings>(defaultSettings);
+  
+  // Polling to update game state when AI players act
+  useEffect(() => {
+    if (!game) return;
+    
+    const pollGameState = setInterval(() => {
+      const currentState = game.getGameState();
+      // Only update if the game state has actually changed
+      if (JSON.stringify(currentState) !== JSON.stringify(gameState)) {
+        setGameState(currentState);
+        
+        // Check if we need to trigger more AI actions
+        triggerAIPlayerIfNeeded();
+      }
+    }, 500); // Check every 500ms
+    
+    return () => clearInterval(pollGameState);
+  }, [game, gameState]);
 
   // Initialize game
   useEffect(() => {
@@ -41,6 +61,14 @@ export default function PokerTrainer() {
     setGame(newGame);
     newGame.startNewHand();
     setGameState(newGame.getGameState());
+    
+    // Trigger AI players if needed after game starts
+    setTimeout(() => {
+      const currentPlayer = newGame.getCurrentPlayer();
+      if (currentPlayer && !currentPlayer.isHuman) {
+        newGame.startAIActions();
+      }
+    }, 500);
   }, []);
 
   // Handle player actions
@@ -62,7 +90,7 @@ export default function PokerTrainer() {
           return;
         } else if (action === 'bet' || action === 'raise') {
           // Show CSI calculator for betting decisions
-          setShowCSICalculator(true);
+          setShowCSICalculatorModal(true);
           return;
         }
       }
@@ -99,8 +127,24 @@ export default function PokerTrainer() {
         setTimeout(() => {
           game.startNewHand();
           setGameState(game.getGameState());
+          // Trigger AI players after new hand
+          triggerAIPlayerIfNeeded();
         }, 3000);
+      } else {
+        // Trigger AI player turn after human action
+        triggerAIPlayerIfNeeded();
       }
+    }
+  };
+
+  // AI player automation
+  const triggerAIPlayerIfNeeded = () => {
+    if (!game || !gameState) return;
+    
+    const currentPlayer = game.getCurrentPlayer();
+    if (currentPlayer && !currentPlayer.isHuman && !currentPlayer.isFolded && !currentPlayer.isAllIn) {
+      // It's an AI player's turn - trigger automatic play
+      game.startAIActions();
     }
   };
 
@@ -156,6 +200,14 @@ export default function PokerTrainer() {
     if (game) {
       game.startNewHand();
       setGameState(game.getGameState());
+      
+      // Trigger AI players after new hand starts
+      setTimeout(() => {
+        const currentPlayer = game.getCurrentPlayer();
+        if (currentPlayer && !currentPlayer.isHuman) {
+          game.startAIActions();
+        }
+      }, 500);
     }
   };
 
@@ -169,7 +221,7 @@ export default function PokerTrainer() {
 
   return (
     <div className="min-h-screen bg-green-800 p-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full px-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold text-white">Texas Hold&apos;em Trainer</h1>
@@ -182,15 +234,21 @@ export default function PokerTrainer() {
             </button>
             <button
               onClick={() => setShowPushFoldMatrix(!showPushFoldMatrix)}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm"
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm"
             >
               📈 Push/Fold Matrix
             </button>
             <button
               onClick={() => setShowCSICalculator(!showCSICalculator)}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-sm"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm"
             >
               🧮 CSI Calculator
+            </button>
+            <button
+              onClick={() => setShowPotOddsCalculator(!showPotOddsCalculator)}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm"
+            >
+              📊 Pot Odds
             </button>
             <label className="flex items-center space-x-2 bg-gray-700 px-3 py-2 rounded text-white text-sm">
               <input
@@ -203,7 +261,7 @@ export default function PokerTrainer() {
             </label>
             <button
               onClick={startNewGame}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"
+              className="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded text-sm"
             >
               🔄 New Hand
             </button>
@@ -211,23 +269,117 @@ export default function PokerTrainer() {
         </div>
 
         {/* Main game area */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 min-h-[600px]">
           {/* Poker table */}
-          <div className="lg:col-span-3">
-            <PokerTable 
-              gameState={gameState}
-              onAction={handleAction}
-              settings={settings}
-            />
+          <div className="lg:col-span-4 flex flex-col">
+            {/* Table container with flexible height */}
+            <div className="flex-1 min-h-[450px] flex items-center justify-center">
+              <PokerTable 
+                gameState={gameState}
+                onAction={handleAction}
+                settings={settings}
+              />
+            </div>
+            
+            {/* Bottom table area for Push/Fold Matrix only */}
+            {showPushFoldMatrix && (
+              <div className="bg-gray-800 rounded-lg p-4 mt-4">
+                <div className="bg-white rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-800">Push/Fold Matrix</h3>
+                    <button
+                      onClick={() => setShowPushFoldMatrix(false)}
+                      className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <PushFoldMatrix
+                    playerHoleCards={gameState.players.find(p => p.isHuman)?.holeCards}
+                    csi={gameState.players.find(p => p.isHuman) ? calculateCSI(
+                      gameState.players.find(p => p.isHuman)!.chips, 
+                      gameState.smallBlind, 
+                      gameState.bigBlind
+                    ) : 10}
+                    position="button"
+                    onClose={() => setShowPushFoldMatrix(false)}
+                    embedded={true}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Side panel */}
-          <div className="space-y-4">
+          <div className="lg:col-span-2 space-y-4">
             <GameControls
               gameState={gameState}
               onAction={handleAction}
               validActions={game.getValidActions()}
             />
+            
+            {/* CSI Calculator in side panel */}
+            {showCSICalculator && gameState && gameState.players.find(p => p.isHuman) && (
+              <div className="bg-white rounded-lg p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-gray-800">CSI Calculator</h3>
+                  <button
+                    onClick={() => setShowCSICalculator(false)}
+                    className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+                <CSICalculatorSimple
+                  gameState={gameState}
+                  humanPlayer={gameState.players.find(p => p.isHuman)!}
+                  onComplete={(csi) => {
+                    setShowCSICalculator(false);
+                    if (pendingAction) {
+                      executeAction(pendingAction.action, pendingAction.amount);
+                      setPendingAction(null);
+                    }
+                  }}
+                  onClose={() => {
+                    setShowCSICalculator(false);
+                    setPendingAction(null);
+                  }}
+                  embedded={true}
+                />
+              </div>
+            )}
+            
+            {/* Pot Odds Calculator in side panel */}
+            {showPotOddsCalculator && gameState && gameState.players.find(p => p.isHuman) && (
+              <div className="bg-white rounded-lg p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-gray-800">Pot Odds Calculator</h3>
+                  <button
+                    onClick={() => setShowPotOddsCalculator(false)}
+                    className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+                <OddsCalculator
+                  gameState={gameState}
+                  humanPlayer={gameState.players.find(p => p.isHuman)!}
+                  callAmount={Math.max(...gameState.players.map(p => p.currentBet)) - gameState.players.find(p => p.isHuman)!.currentBet}
+                  onComplete={(shouldCall) => {
+                    setShowPotOddsCalculator(false);
+                    if (pendingAction && shouldCall) {
+                      executeAction(pendingAction.action, pendingAction.amount);
+                      setPendingAction(null);
+                    }
+                  }}
+                  onClose={() => {
+                    setShowPotOddsCalculator(false);
+                    setPendingAction(null);
+                  }}
+                  embedded={true}
+                />
+              </div>
+            )}
             
             {showHandRankings && (
               <HandRankings onClose={() => setShowHandRankings(false)} />
@@ -245,34 +397,20 @@ export default function PokerTrainer() {
         />
       )}
 
-      {/* Push/Fold Matrix */}
-      {showPushFoldMatrix && gameState && (
-        <PushFoldMatrix
-          playerHoleCards={gameState.players.find(p => p.isHuman)?.holeCards}
-          csi={gameState.players.find(p => p.isHuman) ? calculateCSI(
-            gameState.players.find(p => p.isHuman)!.chips, 
-            gameState.smallBlind, 
-            gameState.bigBlind
-          ) : 10}
-          position="button"
-          onClose={() => setShowPushFoldMatrix(false)}
-        />
-      )}
-
-      {/* CSI Calculator */}
-      {showCSICalculator && gameState && gameState.players.find(p => p.isHuman) && (
-        <CSICalculator
+      {/* CSI Calculator Modal */}
+      {showCSICalculatorModal && gameState && gameState.players.find(p => p.isHuman) && (
+        <CSICalculatorSimple
           gameState={gameState}
           humanPlayer={gameState.players.find(p => p.isHuman)!}
           onComplete={(csi) => {
-            setShowCSICalculator(false);
+            setShowCSICalculatorModal(false);
             if (pendingAction) {
               executeAction(pendingAction.action, pendingAction.amount);
               setPendingAction(null);
             }
           }}
           onClose={() => {
-            setShowCSICalculator(false);
+            setShowCSICalculatorModal(false);
             setPendingAction(null);
           }}
         />

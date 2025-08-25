@@ -60,3 +60,33 @@ Questions are loaded from JSON files and presented contextually based on game si
 
 **Push/Fold Matrix**
 13x13 grid showing optimal hand ranges based on CSI values. Supports hand highlighting and interactive exploration of strategy ranges.
+
+**AI Player System**
+Automated computer opponents with distinct personalities (Tight/Loose/Aggressive/Passive/Maniac/Rock). AI players automatically make decisions using sophisticated poker strategy, bluffing patterns, and realistic timing delays.
+
+## Recent Improvements
+
+**UI/UX Enhancements (Latest Session)**
+- Fixed text readability issues throughout application with improved contrast
+- Implemented consistent, professional color scheme for all action buttons
+- Moved blinds display to center pot area for better visual organization
+- Removed distracting animated elements that caused visual noise
+- Enhanced positioning logic to prevent player overlap with UI elements
+
+**Layout Optimizations**
+- Converted modals to embedded components for better workflow
+- Implemented responsive grid layout supporting side-by-side component viewing
+- Fixed player positioning algorithms to accommodate pot display properly
+- Added subtle position indicators (SB/BB/D) with professional styling
+
+**Educational Tool Integration**
+- Simplified CSI Calculator to focus on core formula understanding
+- Enhanced Pot Odds Calculator with step-by-step explanations
+- Integrated "Calculate & Bet" mode for enforced learning
+- Updated all explanatory text for better clarity and readability
+
+**Automated Gameplay**
+- Implemented automatic AI player turns with realistic timing
+- Added game state polling system for seamless AI integration  
+- Created intelligent action triggering based on player types
+- Maintains educational focus while providing engaging gameplay

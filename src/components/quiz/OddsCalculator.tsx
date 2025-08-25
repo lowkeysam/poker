@@ -10,6 +10,7 @@ interface OddsCalculatorProps {
   callAmount: number;
   onComplete: (shouldCall: boolean) => void;
   onClose: () => void;
+  embedded?: boolean;
 }
 
 interface CalculationStep {
@@ -26,7 +27,8 @@ export default function OddsCalculator({
   humanPlayer, 
   callAmount, 
   onComplete, 
-  onClose 
+  onClose,
+  embedded = false
 }: OddsCalculatorProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
@@ -78,10 +80,10 @@ export default function OddsCalculator({
     },
     {
       id: 'equity_needed',
-      question: 'What percentage equity do you need to break even on this call?',
+      question: 'What percentage equity (chance of winning) do you need to break even on this call?',
       correctAnswer: Math.round(equityNeeded * 10) / 10,
-      explanation: `Equity needed = Call amount ÷ (Total pot + Call amount) = $${callAmount} ÷ $${totalPot + callAmount} = ${equityNeeded.toFixed(1)}%`,
-      hint: 'Formula: Call amount ÷ (Pot after call) × 100',
+      explanation: `Required equity = Call amount ÷ (Total pot after call) × 100 = $${callAmount} ÷ $${totalPot + callAmount} × 100 = ${equityNeeded.toFixed(1)}%. This means you need to win ${equityNeeded.toFixed(1)}% of the time to break even.`,
+      hint: 'Formula: (Your call ÷ Total pot after call) × 100. This is the minimum win rate you need.',
       type: 'percentage'
     }
   ];
@@ -112,9 +114,200 @@ export default function OddsCalculator({
     }
   };
 
+  const shouldCall = estimatedEquity >= equityNeeded;
+
+  const completionContent = (
+    <>
+      <div className="text-center mb-6">
+        <div className="text-2xl font-bold text-gray-800 mb-2">
+          Decision: {shouldCall ? 
+            <span className="text-green-600">CALL</span> : 
+            <span className="text-red-600">FOLD</span>
+          }
+        </div>
+        <div className="text-black font-medium">
+          You need {equityNeeded.toFixed(1)}% chance to win, your estimated chance: {estimatedEquity.toFixed(1)}%
+        </div>
+      </div>
+
+      <div className={`border-2 rounded-lg p-4 mb-4 ${
+        shouldCall ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+      }`}>
+        <h3 className={`font-bold mb-2 ${
+          shouldCall ? 'text-green-800' : 'text-red-800'
+        }`}>
+          Mathematical Analysis:
+        </h3>
+        <div className={`text-sm ${
+          shouldCall ? 'text-green-900' : 'text-red-900'
+        }`}>
+          {shouldCall 
+            ? `Since your chance of winning (${estimatedEquity.toFixed(1)}%) is higher than the break-even percentage (${equityNeeded.toFixed(1)}%), this call will be profitable in the long run.`
+            : `Since your chance of winning (${estimatedEquity.toFixed(1)}%) is lower than the break-even percentage (${equityNeeded.toFixed(1)}%), this call will lose money in the long run.`
+          }
+        </div>
+      </div>
+
+      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <h3 className="font-bold text-gray-800 mb-3">Your Calculation:</h3>
+        <div className="space-y-2 text-sm">
+          <div>• Current pot: ${gameState.pot}</div>
+          <div>• Call amount: ${callAmount}</div>
+          <div>• Total pot after call: ${totalPot}</div>
+          <div>• Pot odds: {potOdds.toFixed(1)}:1</div>
+          <div className="font-bold">• Equity needed: {equityNeeded.toFixed(1)}%</div>
+        </div>
+      </div>
+
+      <div className="text-center space-x-3">
+        <button
+          onClick={() => onComplete(shouldCall)}
+          className={`font-bold py-3 px-6 rounded-lg transition-colors ${
+            shouldCall 
+              ? 'bg-green-600 hover:bg-green-700 text-white' 
+              : 'bg-red-600 hover:bg-red-700 text-white'
+          }`}
+        >
+          {shouldCall ? 'Make the Call' : 'Fold the Hand'}
+        </button>
+        <button
+          onClick={onClose}
+          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </>
+  );
+
+  const calculationContent = (
+    <>
+      {/* Progress bar */}
+      <div className="mb-6">
+        <div className="bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+          />
+        </div>
+        <div className="text-sm text-gray-800 mt-2 font-medium">
+          Progress: {currentStep + 1} of {steps.length} steps
+        </div>
+      </div>
+
+      {/* Game situation */}
+      <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 className="font-bold text-blue-800 mb-3">Current Situation:</h4>
+        <div className="text-base text-gray-900 space-y-2">
+          <div><strong>Your cards:</strong> {humanPlayer.holeCards.map(c => c.unicode).join(' ')}</div>
+          <div><strong>Board:</strong> {gameState.communityCards.map(c => c.unicode).join(' ') || 'Pre-flop'}</div>
+          <div><strong>Pot size:</strong> ${gameState.pot}</div>
+          <div><strong>You need to call:</strong> ${callAmount}</div>
+        </div>
+      </div>
+
+      {/* Current step */}
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4 leading-relaxed">
+          {currentStepData.question}
+        </h3>
+
+        <input
+          type="number"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          className="w-full p-4 border-2 border-gray-300 rounded-lg text-xl text-center mb-4 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          placeholder={currentStepData.type === 'percentage' ? 'Enter percentage (e.g., 25)' : 'Enter amount'}
+          step={currentStepData.type === 'percentage' ? '0.1' : '1'}
+        />
+
+        {showHint && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="text-red-800 font-semibold mb-2">
+              ❌ Not quite right. Let me help:
+            </div>
+            <div className="text-red-800 text-base mb-2 font-medium">
+              {currentStepData.hint}
+            </div>
+            <div className="text-red-900 font-bold text-lg">
+              Correct answer: {currentStepData.correctAnswer}{currentStepData.type === 'percentage' ? '%' : ''}
+            </div>
+            <div className="text-red-900 text-base mt-3 font-medium">
+              {currentStepData.explanation}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Previous answers */}
+      {answers.length > 0 && (
+        <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
+          <h4 className="font-semibold text-green-800 mb-2">Previous Steps:</h4>
+          <div className="text-sm space-y-1">
+            {answers.map((answer, index) => (
+              <div key={index} className="text-green-700">
+                ✅ Step {index + 1}: {answer}{steps[index].type === 'percentage' ? '%' : ''} - {steps[index].explanation}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex space-x-3">
+        <button
+          onClick={handleSubmit}
+          disabled={!userInput}
+          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+        >
+          {showHint ? 'Try Again' : 'Submit Answer'}
+        </button>
+        
+        {!showHint && currentStepData.hint && (
+          <button
+            onClick={() => setShowHint(true)}
+            className="px-4 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-lg transition-colors"
+          >
+            💡 Hint
+          </button>
+        )}
+      </div>
+
+      {/* Reference */}
+      <div className="mt-6 text-sm text-gray-800 bg-blue-50 border border-blue-200 p-4 rounded-lg">
+        <p className="font-semibold text-blue-800 mb-2">💡 Pot Odds Formula</p>
+        <p className="text-blue-900 leading-relaxed">Compare what you can win vs. what you risk. If your equity is higher than the required percentage, the call is profitable!</p>
+      </div>
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full">
+        <div className="p-4">
+          {isComplete ? (
+            <>
+              <div className="mb-4 p-3 bg-green-600 text-white rounded-lg">
+                <h3 className="font-bold">✅ Odds Calculation Complete!</h3>
+              </div>
+              {completionContent}
+            </>
+          ) : (
+            <>
+              <div className="mb-4 p-3 bg-blue-600 text-white rounded-lg flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold">🧮 Calculate Pot Odds</h3>
+                  <p className="text-blue-100 text-sm">Step {currentStep + 1} of {steps.length}</p>
+                </div>
+              </div>
+              {calculationContent}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (isComplete) {
-    const shouldCall = estimatedEquity >= equityNeeded;
-    
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full">
@@ -123,65 +316,7 @@ export default function OddsCalculator({
           </div>
           
           <div className="p-6">
-            <div className="text-center mb-6">
-              <div className="text-2xl font-bold text-gray-800 mb-2">
-                Decision: {shouldCall ? 
-                  <span className="text-green-600">CALL</span> : 
-                  <span className="text-red-600">FOLD</span>
-                }
-              </div>
-              <div className="text-gray-600">
-                You need {equityNeeded.toFixed(1)}% equity, estimated equity: {estimatedEquity.toFixed(1)}%
-              </div>
-            </div>
-
-            <div className={`border-2 rounded-lg p-4 mb-4 ${
-              shouldCall ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
-            }`}>
-              <h3 className={`font-bold mb-2 ${
-                shouldCall ? 'text-green-800' : 'text-red-800'
-              }`}>
-                Mathematical Analysis:
-              </h3>
-              <div className={`text-sm ${
-                shouldCall ? 'text-green-900' : 'text-red-900'
-              }`}>
-                {shouldCall 
-                  ? `Since your estimated equity (${estimatedEquity.toFixed(1)}%) is greater than the required equity (${equityNeeded.toFixed(1)}%), this call is mathematically profitable.`
-                  : `Since your estimated equity (${estimatedEquity.toFixed(1)}%) is less than the required equity (${equityNeeded.toFixed(1)}%), this call is not profitable.`
-                }
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <h3 className="font-bold text-gray-800 mb-3">Your Calculation:</h3>
-              <div className="space-y-2 text-sm">
-                <div>• Current pot: ${gameState.pot}</div>
-                <div>• Call amount: ${callAmount}</div>
-                <div>• Total pot after call: ${totalPot}</div>
-                <div>• Pot odds: {potOdds.toFixed(1)}:1</div>
-                <div className="font-bold">• Equity needed: {equityNeeded.toFixed(1)}%</div>
-              </div>
-            </div>
-
-            <div className="text-center space-x-3">
-              <button
-                onClick={() => onComplete(shouldCall)}
-                className={`font-bold py-3 px-6 rounded-lg transition-colors ${
-                  shouldCall 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
-                    : 'bg-red-600 hover:bg-red-700 text-white'
-                }`}
-              >
-                {shouldCall ? 'Make the Call' : 'Fold the Hand'}
-              </button>
-              <button
-                onClick={onClose}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
+            {completionContent}
           </div>
         </div>
       </div>
@@ -205,100 +340,7 @@ export default function OddsCalculator({
         </div>
 
         <div className="p-6">
-          {/* Progress bar */}
-          <div className="mb-6">
-            <div className="bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-              />
-            </div>
-            <div className="text-sm text-gray-600 mt-1">
-              Progress: {currentStep + 1} of {steps.length} steps
-            </div>
-          </div>
-
-          {/* Game situation */}
-          <div className="mb-4 bg-gray-50 border rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Current Situation:</h4>
-            <div className="text-sm space-y-1">
-              <div>Your cards: {humanPlayer.holeCards.map(c => c.unicode).join(' ')}</div>
-              <div>Board: {gameState.communityCards.map(c => c.unicode).join(' ') || 'Pre-flop'}</div>
-              <div>Pot size: ${gameState.pot}</div>
-              <div>You need to call: ${callAmount}</div>
-            </div>
-          </div>
-
-          {/* Current step */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              {currentStepData.question}
-            </h3>
-
-            <input
-              type="number"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg text-center mb-4"
-              placeholder={currentStepData.type === 'percentage' ? 'Enter percentage (e.g., 25)' : 'Enter amount'}
-              step={currentStepData.type === 'percentage' ? '0.1' : '1'}
-            />
-
-            {showHint && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="text-red-800 font-semibold mb-2">
-                  ❌ Not quite right. Let me help:
-                </div>
-                <div className="text-red-700 text-sm mb-2">
-                  {currentStepData.hint}
-                </div>
-                <div className="text-red-900 font-medium">
-                  Correct answer: {currentStepData.correctAnswer}{currentStepData.type === 'percentage' ? '%' : ''}
-                </div>
-                <div className="text-red-800 text-sm mt-2">
-                  {currentStepData.explanation}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Previous answers */}
-          {answers.length > 0 && (
-            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
-              <h4 className="font-semibold text-green-800 mb-2">Previous Steps:</h4>
-              <div className="text-sm space-y-1">
-                {answers.map((answer, index) => (
-                  <div key={index} className="text-green-700">
-                    ✅ Step {index + 1}: {answer}{steps[index].type === 'percentage' ? '%' : ''} - {steps[index].explanation}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex space-x-3">
-            <button
-              onClick={handleSubmit}
-              disabled={!userInput}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-            >
-              {showHint ? 'Try Again' : 'Submit Answer'}
-            </button>
-            
-            {!showHint && currentStepData.hint && (
-              <button
-                onClick={() => setShowHint(true)}
-                className="px-4 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-lg transition-colors"
-              >
-                💡 Hint
-              </button>
-            )}
-          </div>
-
-          {/* Reference */}
-          <div className="mt-6 text-xs text-gray-600 bg-gray-50 p-3 rounded">
-            <p><strong>Pot Odds Formula:</strong> Compare what you can win vs. what you risk. If your equity is higher than the required percentage, the call is profitable!</p>
-          </div>
+          {calculationContent}
         </div>
       </div>
     </div>

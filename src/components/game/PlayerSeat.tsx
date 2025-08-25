@@ -12,6 +12,8 @@ interface PlayerSeatProps {
   gameStage: GameStage;
   showCards: boolean;
   onAction: (action: string, amount?: number) => void;
+  isSmallBlind?: boolean;
+  isBigBlind?: boolean;
 }
 
 export default function PlayerSeat({
@@ -22,7 +24,9 @@ export default function PlayerSeat({
   csiInfo,
   gameStage,
   showCards,
-  onAction
+  onAction,
+  isSmallBlind = false,
+  isBigBlind = false
 }: PlayerSeatProps) {
 
   const getCSIColor = (csi: number) => {
@@ -85,9 +89,6 @@ export default function PlayerSeat({
         {/* Player name */}
         <div className="font-semibold text-sm mb-1 text-gray-800">
           {player.name}
-          {isDealer && (
-            <span className="ml-1 bg-yellow-500 text-white text-xs px-1 rounded">D</span>
-          )}
         </div>
 
         {/* Cards */}
@@ -132,10 +133,25 @@ export default function PlayerSeat({
         )}
       </div>
 
-      {/* Bet chips display */}
-      {player.currentBet > 0 && !player.isFolded && (
-        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold">
-          ${player.currentBet}
+      {/* Bet chips display - REMOVED */}
+
+      {/* Position indicators */}
+      {isDealer && (
+        <div className="absolute -top-3 -right-3 w-7 h-7 bg-amber-600 rounded-full border-2 border-white shadow-sm flex items-center justify-center">
+          <span className="text-white text-xs font-bold">D</span>
+        </div>
+      )}
+      
+      {/* Small Blind and Big Blind indicators - Subtle, consistent colors */}
+      {isSmallBlind && (
+        <div className="absolute -top-2 -left-2 w-6 h-6 bg-slate-600 rounded-full border-2 border-white shadow-sm flex items-center justify-center">
+          <span className="text-white text-xs font-bold">SB</span>
+        </div>
+      )}
+      
+      {isBigBlind && (
+        <div className="absolute -top-2 -right-2 w-6 h-6 bg-slate-700 rounded-full border-2 border-white shadow-sm flex items-center justify-center">
+          <span className="text-white text-xs font-bold">BB</span>
         </div>
       )}
 

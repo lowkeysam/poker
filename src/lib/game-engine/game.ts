@@ -1,16 +1,20 @@
 import { GameState, Player, Card, GameStage, Action, GameAction, HandResult, GameSettings } from '../types';
 import { Deck } from './deck';
 import { evaluateHand, compareHands } from './evaluator';
+import { AIPlayerDecision, AI_PERSONALITIES } from './ai-player';
 
 export class PokerGame {
   private gameState: GameState;
   private deck: Deck;
   private settings: GameSettings;
+  private aiPlayers: Map<string, AIPlayerDecision> = new Map();
+  private aiActionTimer: NodeJS.Timeout | null = null;
 
   constructor(settings: GameSettings) {
     this.settings = settings;
     this.deck = new Deck();
     this.gameState = this.initializeGame();
+    this.initializeAIPlayers();
   }
 
   private initializeGame(): GameState {
@@ -49,7 +53,27 @@ export class PokerGame {
     };
   }
 
+  private initializeAIPlayers(): void {
+    // Assign AI personalities to non-human players
+    const personalityTypes = Object.keys(AI_PERSONALITIES);
+    
+    for (const player of this.gameState.players) {
+      if (!player.isHuman) {
+        // Assign a random personality, but ensure variety
+        const personalityType = personalityTypes[Math.floor(Math.random() * personalityTypes.length)];
+        this.aiPlayers.set(player.id, new AIPlayerDecision(personalityType));
+        
+        // Update player name to include personality hint
+        const personality = AI_PERSONALITIES[personalityType];
+        player.name = `${player.name} (${personality.name})`;
+      }
+    }
+  }
+
   startNewHand(): void {
+    // Stop any pending AI actions
+    this.stopAIActions();
+    
     this.deck.reset();
     this.gameState.stage = 'preflop';
     this.gameState.pot = 0;
@@ -80,6 +104,9 @@ export class PokerGame {
 
     // Set first player to act (left of big blind)
     this.gameState.currentPlayerIndex = this.getNextPlayerIndex((this.gameState.dealer + 3) % this.gameState.players.length);
+    
+    // Start AI actions if needed
+    this.scheduleAIAction();
   }
 
   private postBlinds(): void {
@@ -126,16 +153,11 @@ export class PokerGame {
       }
     }
 
-    // Randomly show some opponent cards for learning
-    if (this.settings.showOpponentCards === 'sometimes') {
-      this.maybeShowOpponentCards();
-    } else if (this.settings.showOpponentCards === 'always') {
-      this.gameState.players.forEach(p => {
-        if (!p.isHuman && p.isActive && !p.isFolded) {
-          p.showCards = true;
-        }
-      });
-    }
+    // Don't show opponent cards during initial deal - only after flop
+    // Reset all showCards flags during new hand
+    this.gameState.players.forEach(p => {
+      p.showCards = false;
+    });
   }
 
   private maybeShowOpponentCards(): void {
@@ -145,6 +167,25 @@ export class PokerGame {
     for (let i = 0; i < numToShow; i++) {
       const randomIndex = Math.floor(Math.random() * opponents.length);
       opponents[randomIndex].showCards = true;
+    }
+  }
+
+  private maybeShowOpponentCardsPostFlop(): void {
+    // Only show opponent cards after flop for players who are still active
+    if (this.settings.showOpponentCards === 'sometimes') {
+      const opponents = this.gameState.players.filter(p => !p.isHuman && p.isActive && !p.isFolded);
+      const numToShow = Math.min(2, Math.floor(Math.random() * opponents.length + 1));
+      
+      for (let i = 0; i < numToShow; i++) {
+        const randomIndex = Math.floor(Math.random() * opponents.length);
+        opponents[randomIndex].showCards = true;
+      }
+    } else if (this.settings.showOpponentCards === 'always') {
+      this.gameState.players.forEach(p => {
+        if (!p.isHuman && p.isActive && !p.isFolded) {
+          p.showCards = true;
+        }
+      });
     }
   }
 
@@ -193,6 +234,8 @@ export class PokerGame {
         this.advanceStage();
       } else {
         this.gameState.currentPlayerIndex = this.getNextPlayerIndex(this.gameState.currentPlayerIndex);
+        // After moving to next player, check if it's an AI player and schedule their action
+        this.scheduleAIAction();
       }
     }
 
@@ -277,6 +320,8 @@ export class PokerGame {
       case 'preflop':
         this.dealFlop();
         this.gameState.stage = 'flop';
+        // Now show some opponent cards for learning (they've "stayed in" past preflop)
+        this.maybeShowOpponentCardsPostFlop();
         break;
       case 'flop':
         this.dealTurn();
@@ -294,6 +339,9 @@ export class PokerGame {
 
     // Set first player to act (left of dealer)
     this.gameState.currentPlayerIndex = this.getNextPlayerIndex((this.gameState.dealer + 1) % this.gameState.players.length);
+    
+    // Schedule AI action for new betting round
+    this.scheduleAIAction();
   }
 
   private dealFlop(): void {
@@ -433,5 +481,83 @@ export class PokerGame {
   calculateCSI(player: Player): number {
     const totalBlinds = this.gameState.smallBlind + this.gameState.bigBlind;
     return player.chips / totalBlinds;
+  }
+
+  // AI Player methods
+  private scheduleAIAction(): void {
+    // Clear any existing timer
+    if (this.aiActionTimer) {
+      clearTimeout(this.aiActionTimer);
+      this.aiActionTimer = null;
+    }
+
+    const currentPlayer = this.getCurrentPlayer();
+    if (!currentPlayer || currentPlayer.isHuman || currentPlayer.isFolded || currentPlayer.isAllIn) {
+      return;
+    }
+
+    // Add realistic thinking time (0.5 to 3 seconds)
+    const thinkingTime = Math.random() * 2500 + 500;
+    
+    this.aiActionTimer = setTimeout(() => {
+      this.processAIAction();
+    }, thinkingTime);
+  }
+
+  private processAIAction(): void {
+    const currentPlayer = this.getCurrentPlayer();
+    if (!currentPlayer || currentPlayer.isHuman || currentPlayer.isFolded || currentPlayer.isAllIn) {
+      return;
+    }
+
+    const aiPlayer = this.aiPlayers.get(currentPlayer.id);
+    if (!aiPlayer) {
+      // Fallback - fold if no AI player found
+      this.playerAction('fold');
+      return;
+    }
+
+    try {
+      const validActions = this.getValidActions();
+      const decision = aiPlayer.makeDecision(currentPlayer, this.gameState, validActions);
+      
+      // Execute the AI decision
+      console.log(`${currentPlayer.name}: ${decision.reasoning}`);
+      this.playerAction(decision.action, decision.amount);
+      
+    } catch (error) {
+      console.error(`AI player ${currentPlayer.name} decision error:`, error);
+      // Fallback to safe action
+      const validActions = this.getValidActions();
+      if (validActions.includes('check')) {
+        this.playerAction('check');
+      } else if (validActions.includes('fold')) {
+        this.playerAction('fold');
+      } else if (validActions.length > 0) {
+        this.playerAction(validActions[0]);
+      }
+    }
+  }
+
+  // Start AI actions after dealing
+  public startAIActions(): void {
+    this.scheduleAIAction();
+  }
+
+  // Stop AI timer (useful for cleanup)
+  public stopAIActions(): void {
+    if (this.aiActionTimer) {
+      clearTimeout(this.aiActionTimer);
+      this.aiActionTimer = null;
+    }
+  }
+
+  // Get AI player stats for debugging
+  public getAIPlayerStats(playerId: string): any {
+    const aiPlayer = this.aiPlayers.get(playerId);
+    return aiPlayer ? {
+      personality: aiPlayer.getPersonality(),
+      stats: aiPlayer.getStats()
+    } : null;
   }
 }

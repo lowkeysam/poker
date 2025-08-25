@@ -47,7 +47,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
       {/* Player info */}
       <div className="text-center pb-4 border-b">
         <h3 className="text-lg font-bold text-gray-800">Your Turn</h3>
-        <div className="text-sm text-gray-600 mt-1">
+        <div className="text-sm text-gray-900 font-medium mt-1">
           Chips: ${humanPlayer.chips.toLocaleString()}
         </div>
         <div className="text-sm font-semibold text-blue-600">
@@ -59,7 +59,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
       {potOdds && (
         <div className="bg-blue-50 p-3 rounded border">
           <h4 className="font-semibold text-blue-800 mb-2">Pot Odds</h4>
-          <div className="text-sm space-y-1">
+          <div className="text-sm space-y-1 text-black font-medium">
             <div>Call: ${callAmount} to win ${gameState.pot + callAmount}</div>
             <div>Odds: {potOdds.odds.toFixed(1)}:1</div>
             <div>Need: {potOdds.percentage.toFixed(1)}% equity</div>
@@ -72,7 +72,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
         {validActions.includes('fold') && (
           <button
             onClick={() => handleAction('fold')}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors"
+            className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded transition-colors"
           >
             Fold
           </button>
@@ -81,7 +81,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
         {validActions.includes('check') && (
           <button
             onClick={() => handleAction('check')}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded transition-colors"
           >
             Check
           </button>
@@ -99,7 +99,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
         {validActions.includes('raise') && (
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Raise to:</label>
+              <label className="text-sm font-medium text-gray-900">Raise to:</label>
               <input
                 type="number"
                 value={raiseAmount}
@@ -112,7 +112,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
             <button
               onClick={() => handleAction('raise')}
               disabled={raiseAmount < gameState.minRaise || raiseAmount > humanPlayer.chips}
-              className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors"
             >
               Raise to ${raiseAmount}
             </button>
@@ -122,7 +122,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
         {validActions.includes('all-in') && (
           <button
             onClick={() => handleAction('all-in')}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-colors animate-pulse"
+            className="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded transition-colors"
           >
             All-In (${humanPlayer.chips})
           </button>
@@ -132,7 +132,7 @@ export default function GameControls({ gameState, onAction, validActions }: Game
       {/* Strategy advice toggle */}
       <button
         onClick={() => setShowStrategy(!showStrategy)}
-        className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded border transition-colors"
+        className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold py-2 px-4 rounded border transition-colors"
       >
         {showStrategy ? '🙈 Hide' : '💡 Show'} Strategy Tips
       </button>

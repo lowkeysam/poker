@@ -17,6 +17,8 @@
 /.next/
 /out/
 
+/killeveryone
+
 # production
 /build
 

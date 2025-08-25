@@ -5,42 +5,35 @@ import { GameStage } from '@/lib/types';
 interface PotDisplayProps {
   pot: number;
   stage: GameStage;
+  smallBlind: number;
+  bigBlind: number;
 }
 
-export default function PotDisplay({ pot, stage }: PotDisplayProps) {
+export default function PotDisplay({ pot, stage, smallBlind, bigBlind }: PotDisplayProps) {
   if (pot === 0) return null;
 
   return (
-    <div className="mt-2">
-      <div className="bg-yellow-600 text-white px-4 py-2 rounded-full shadow-lg border-2 border-yellow-400">
+    <div className="mt-1">
+      {/* Blinds info above pot */}
+      <div className="mb-2 text-center">
+        <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-bold shadow">
+          Blinds: {smallBlind}/{bigBlind}
+        </div>
+      </div>
+      
+      {/* Pot display */}
+      <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full shadow-2xl border-4 border-yellow-300 transform hover:scale-105 transition-transform">
         <div className="text-center">
-          <div className="text-xs font-semibold text-yellow-100 mb-1">
-            POT
+          <div className="text-base font-black text-yellow-900 mb-1 tracking-wide">
+            💰 POT 💰
           </div>
-          <div className="text-lg font-bold">
+          <div className="text-2xl font-black text-yellow-900 drop-shadow-lg">
             ${pot.toLocaleString()}
           </div>
         </div>
       </div>
       
-      {/* Animated chips */}
-      <div className="flex justify-center mt-1 space-x-1">
-        {Array.from({ length: Math.min(5, Math.floor(pot / 100) + 1) }).map((_, index) => (
-          <div
-            key={index}
-            className={`
-              w-3 h-3 rounded-full border-2
-              ${index % 3 === 0 ? 'bg-red-500 border-red-700' : ''}
-              ${index % 3 === 1 ? 'bg-blue-500 border-blue-700' : ''}
-              ${index % 3 === 2 ? 'bg-green-500 border-green-700' : ''}
-              animate-pulse
-            `}
-            style={{
-              animationDelay: `${index * 0.2}s`
-            }}
-          />
-        ))}
-      </div>
+      {/* Poker chips removed to eliminate blinking circles */}
     </div>
   );
 }
